@@ -41,3 +41,4 @@ jobs:
           command: cves
           image: local://${{ matrix.prj_folder }}:latest
           sarif-file: ${{ matrix.prj_folder }}-cves.json
+          only-severities: critical,high
