@@ -90,7 +90,7 @@ jobs:
           --format json
           --spec-version="${{matrix.cdx_spec_version}}"
           --project-name="${{ matrix.project }}"
-          --project-version="build-${{ github.run_number }}"
+          --project-version="${{ github.run_number }}"
           -o "${{ matrix.project }}-docker_bom.json"
           ${{ matrix.project }}:latest
 
