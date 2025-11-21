@@ -51,21 +51,12 @@ jobs:
   sbom-docker:
     name: Generate docker SBOM
     runs-on: ubuntu-latest
+    container: quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
     strategy:
       fail-fast: false
       matrix:
         project: ["dvna", "vulnado"]
         cdx_spec_version: ["1.5"]
-        include:
-          - project: vulnado
-            cdx_spec_version: "1.5"
-            cdx_image: ghcr.io/cyclonedx/cdxgen-java:v10
-          - project: dvna
-            cdx_spec_version: "1.5"
-            cdx_image: quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
-
-    container:
-      image: ${{matrix.cdx_image}}
 
     steps:
       - name: Checkout Repository
@@ -83,14 +74,14 @@ jobs:
           load: true
           tags: ${{ matrix.project }}:latest
 
-      - name: Generate docker SBOMs using cdxgen
+      - name: Generate docker SBOMs
         run: >
           cdxgen
           --type docker
           --format json
           --spec-version="${{matrix.cdx_spec_version}}"
           --project-name="${{ matrix.project }}"
-          --project-version="${{ github.run_number }}"
+          --project-version="build-${{ github.run_number }}"
           -o "${{ matrix.project }}-docker_bom.json"
           ${{ matrix.project }}:latest
 
