@@ -125,3 +125,28 @@ https://owasp.org/www-project-vulnerable-web-applications-directory/
 # Follow Us on Security News
 Restate aggiornati con le ultime news su temi di cybersecurity, effettuando la subscribe al seguente link:  
 https://davideariu.substack.com/
+
+
+
+Kiry Notes for 7/11/2025 exercises
+● What We Did
+
+  Created a GitHub Actions workflow that automatically generates Software Bill of Materials (SBOM) files using CycloneDX cdxgen tool. The
+   workflow creates SBOMs for your entire project and each vulnerable application (DVNA, Juice Shop, Vulnado).
+
+  Where It Runs
+
+  - GitHub Actions cloud runners (Ubuntu Linux environment)
+  - Triggers on:
+    - Push to main or SbomTest branches
+    - Pull requests to main
+    - Manual trigger via GitHub UI
+
+  Why It's Useful
+
+  Security & Compliance:
+  - Inventory all dependencies - Know exactly what open-source components and libraries your applications use
+  - Vulnerability management - Easily identify which apps are affected when a vulnerability is announced (e.g., "Does my app use Log4j?")
+  - Supply chain security - Track your software supply chain and detect malicious/compromised dependencies
+  - Compliance requirements - Many regulations (US Executive Order 14028, EU Cyber Resilience Act) now require SBOMs
+  - Dependency Track integration - Your SBOMs can be imported into Dependency Track (already in your project) for continuous monitoring

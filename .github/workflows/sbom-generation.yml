@@ -1,0 +1,77 @@
+name: SBOM Generation
+
+on:
+  push:
+    branches: [ "main", "SbomTest" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-sbom:
+    name: Generate SBOM with CycloneDX
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install CycloneDX cdxgen
+        run: npm install -g @cyclonedx/cdxgen
+
+      - name: Generate SBOM for entire project
+        run: |
+          cdxgen -o sbom-project.json -t json --spec-version 1.5 .
+          echo "Generated SBOM for entire project"
+
+      - name: Generate SBOM for DVNA app
+        run: |
+          cdxgen -o sbom-dvna.json -t json --spec-version 1.5 ./vuln_apps/dvna
+          echo "Generated SBOM for DVNA"
+
+      - name: Generate SBOM for Juice Shop app
+        run: |
+          cdxgen -o sbom-juice-shop.json -t json --spec-version 1.5 ./vuln_apps/juice-shop
+          echo "Generated SBOM for Juice Shop"
+
+      - name: Generate SBOM for Vulnado app
+        run: |
+          cdxgen -o sbom-vulnado.json -t json --spec-version 1.5 ./vuln_apps/vulnado
+          echo "Generated SBOM for Vulnado"
+
+      - name: Display SBOM summaries
+        run: |
+          echo "=== Project SBOM Summary ==="
+          if [ -f sbom-project.json ]; then
+            echo "Components: $(jq '.components | length' sbom-project.json)"
+            echo "Dependencies: $(jq '.dependencies | length' sbom-project.json)"
+          fi
+          echo ""
+          echo "=== DVNA SBOM Summary ==="
+          if [ -f sbom-dvna.json ]; then
+            echo "Components: $(jq '.components | length' sbom-dvna.json)"
+            echo "Dependencies: $(jq '.dependencies | length' sbom-dvna.json)"
+          fi
+          echo ""
+          echo "=== Juice Shop SBOM Summary ==="
+          if [ -f sbom-juice-shop.json ]; then
+            echo "Components: $(jq '.components | length' sbom-juice-shop.json)"
+            echo "Dependencies: $(jq '.dependencies | length' sbom-juice-shop.json)"
+          fi
+          echo ""
+          echo "=== Vulnado SBOM Summary ==="
+          if [ -f sbom-vulnado.json ]; then
+            echo "Components: $(jq '.components | length' sbom-vulnado.json)"
+            echo "Dependencies: $(jq '.dependencies | length' sbom-vulnado.json)"
+          fi
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-files
+          path: |
+            sbom-*.json
+          retention-days: 90
